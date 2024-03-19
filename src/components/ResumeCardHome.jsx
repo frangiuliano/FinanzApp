@@ -1,14 +1,10 @@
-import {View, Text, Button, Pressable} from 'react-native';
+import {View, Text, Pressable} from 'react-native';
 import React from 'react';
-import {
-  decrement,
-  increment,
-  incrementByAmount,
-} from '../../redux/slices/counterSlice';
+import {decrement, increment} from '../../redux/slices/counterSlice';
 import {useDispatch, useSelector} from 'react-redux';
 
 export default function ResumeCardHome() {
-  const count = useSelector((state: any) => state.counter.value);
+  const count = useSelector(state => state.counter.value);
   const dispatch = useDispatch();
 
   handleIncrement = () => {
