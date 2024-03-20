@@ -1,6 +1,7 @@
 import {View, Text, Pressable, ScrollView} from 'react-native';
 import React from 'react';
 import IconMaterial from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
 
 const quickAccessOptions = [
   {
@@ -8,7 +9,7 @@ const quickAccessOptions = [
     icon: 'attach-money',
     title: 'Añadir gasto',
     description: 'Tocá acá para agregar un gasto',
-    navigation: 'Spend Form',
+    navigation: 'SpendForm',
   },
   {
     key: 2,
@@ -30,7 +31,9 @@ const quickAccessOptions = [
   },
 ];
 
-export default function QuickAccess({navigation}) {
+export default function QuickAccess() {
+  const navigation = useNavigation();
+
   return (
     <View>
       <Text className="font-bold text-lg color-black">Accesos rápidos</Text>
