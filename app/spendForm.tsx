@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -6,133 +6,37 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
-  Pressable,
+  Modal,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Checkbox, RadioButton } from "react-native-paper";
 import { TextInput } from "react-native-paper";
 import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
-import sarasa from "../services/database/firebase";
-import firebase from "../services/database/firebase";
-
-interface Categoria {
-  key: number;
-  label: string;
-  value: string;
-}
-
-const categoriaOptions: Categoria[] = [
-  {
-    key: 1,
-    label: "Categoría",
-    value: "",
-  },
-  {
-    key: 2,
-    label: "Supermercado",
-    value: "supermercado",
-  },
-  {
-    key: 3,
-    label: "Carnicería",
-    value: "carniceria",
-  },
-  {
-    key: 4,
-    label: "Gasto extra",
-    value: "gastoExtra",
-  },
-  {
-    key: 5,
-    label: "Gasto fijo",
-    value: "gastoFijo",
-  },
-  {
-    key: 6,
-    label: "Mascota",
-    value: "mascota",
-  },
-];
-
-interface CantidadDeCuotas {
-  key: number;
-  label: string;
-  value: number;
-}
-
-const cantidadDeCuotasOptions: CantidadDeCuotas[] = [
-  {
-    key: 1,
-    label: "Cantidad de cuotas",
-    value: 1,
-  },
-  {
-    key: 2,
-    label: "3",
-    value: 3,
-  },
-  {
-    key: 3,
-    label: "6",
-    value: 6,
-  },
-  {
-    key: 4,
-    label: "12",
-    value: 12,
-  },
-];
-
-interface Moneda {
-  key: number;
-  label: string;
-  value: string;
-}
-
-const monedaOptions: Moneda[] = [
-  {
-    key: 1,
-    label: "ARS",
-    value: "ARS",
-  },
-  {
-    key: 2,
-    label: "USD",
-    value: "USD",
-  },
-];
-
-interface MetodoDePago {
-  key: number;
-  label: string;
-  value: string;
-}
-
-const metodoDePagoOptions: MetodoDePago[] = [
-  {
-    key: 1,
-    label: "Método de pago",
-    value: "",
-  },
-  {
-    key: 2,
-    label: "Efectivo",
-    value: "efectivo",
-  },
-  {
-    key: 3,
-    label: "Tarjeta de débito",
-    value: "TD",
-  },
-  {
-    key: 4,
-    label: "Tarjeta de crédito",
-    value: "TC",
-  },
-];
+import DatePicker from "react-native-modern-datepicker";
+import { getFormatedDate } from "react-native-modern-datepicker";
+import transformDate from "@/utils/transformDate";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import {
+  addSpend,
+  getCategories,
+  getCuotas,
+  getMetodosDePago,
+  getMoneda,
+} from "@/services/formServices";
+import { Gasto } from "@/interfaces/formInterfaces";
+import { useNavigation } from "expo-router";
+import { NavigationProp } from "@react-navigation/native";
+import { Link } from "expo-router";
 
 export default function NativeForm() {
+  const today = new Date();
+
+  const startDate = getFormatedDate(
+    today.setDate(today.getDate() + 1),
+    "DD/MM/YYYY"
+  );
+
   const [nombreGasto, setNombreGasto] = useState("");
   const [categoria, setCategoria] = useState("");
   const [metodoDePago, setMetodoDePago] = useState("");
@@ -141,38 +45,54 @@ export default function NativeForm() {
   const [moneda, setMoneda] = useState("ARS");
   const [valor, setValor] = useState("");
   const [gastoFijo, setGastoFijo] = useState(false);
+  const [openCalendar, setOpenCalendar] = useState(false);
+  const [date, setDate] = useState(startDate);
 
-  const handleSubmit = () => {
-    firebase
-      .firestore()
-      .collection("gastos")
-      .add({
-        nombreGasto: nombreGasto,
-        categoria: categoria,
-        metodoDePago: metodoDePago,
-        cuota: cuota,
-        cantidadCuotas: cantidadCuotas,
-        moneda: moneda,
-        valor: valor,
-        gastoFijo: gastoFijo,
-      })
-      .then((docRef) => {
-        console.log("Document written with ID: ", docRef.id);
-      })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-      });
+  const dispatch: AppDispatch = useDispatch();
+
+  const { categorias, cantidadDeCuotas, monedas, metodosDePago } = useSelector(
+    (state: RootState) => state.form
+  );
+
+  useEffect(() => {
+    getCategories(dispatch);
+    getCuotas(dispatch);
+    getMoneda(dispatch);
+    getMetodosDePago(dispatch);
+  }, [dispatch]);
+
+  const handleSubmit = (spend: Gasto) => {
+    dispatch(addSpend(spend));
   };
+
+  const handleOnPress = () => {
+    setOpenCalendar(!openCalendar);
+  };
+
+  const handleChange = (propDate: string) => {
+    const fechaFinal = transformDate(propDate);
+    setDate(fechaFinal);
+  };
+
+  const navigation = useNavigation<NavigationProp<any>>();
 
   return (
     <SafeAreaView style={styles.container}>
       <View className="mx-2 h-screen">
         <View className="flex flex-row justify-between mt-3">
           <TouchableOpacity>
-            <AntDesign name="arrowleft" size={24} color="black" />
+            <AntDesign
+              name="arrowleft"
+              size={24}
+              color="black"
+              onPress={() => navigation.goBack()}
+            />
           </TouchableOpacity>
+
           <TouchableOpacity>
-            <FontAwesome6 name="house-chimney" size={24} color="black" />
+            <Link href="/">
+              <FontAwesome6 name="house-chimney" size={24} color="black" />
+            </Link>
           </TouchableOpacity>
         </View>
         <View className="flex flex-row justify-center mt-3">
@@ -200,10 +120,10 @@ export default function NativeForm() {
               selectedValue={moneda}
               onValueChange={(itemValue) => setMoneda(itemValue)}
             >
-              {monedaOptions.map((moneda) => {
+              {monedas.map((moneda) => {
                 return (
                   <Picker.Item
-                    key={moneda.key}
+                    key={moneda.id}
                     label={moneda.label}
                     value={moneda.value}
                   />
@@ -227,10 +147,10 @@ export default function NativeForm() {
             selectedValue={categoria}
             onValueChange={(itemValue) => setCategoria(itemValue)}
           >
-            {categoriaOptions.map((categoria) => {
+            {categorias.map((categoria) => {
               return (
                 <Picker.Item
-                  key={categoria.key}
+                  key={categoria.id}
                   label={categoria.label}
                   value={categoria.value}
                 />
@@ -244,10 +164,10 @@ export default function NativeForm() {
             selectedValue={metodoDePago}
             onValueChange={(value) => setMetodoDePago(value)}
           >
-            {metodoDePagoOptions.map((metodo) => {
+            {metodosDePago.map((metodo) => {
               return (
                 <Picker.Item
-                  key={metodo.key}
+                  key={metodo.id}
                   label={metodo.label}
                   value={metodo.value}
                 />
@@ -296,10 +216,10 @@ export default function NativeForm() {
             selectedValue={cantidadCuotas}
             onValueChange={(itemValue) => setCantidadCuotas(itemValue)}
           >
-            {cantidadDeCuotasOptions.map((cuotas) => {
+            {cantidadDeCuotas.map((cuotas) => {
               return (
                 <Picker.Item
-                  key={cuotas.key}
+                  key={cuotas.id}
                   label={cuotas.label}
                   value={cuotas.value}
                 />
@@ -311,10 +231,51 @@ export default function NativeForm() {
         <View className="flex flex-row items-center my-5">
           <Text className="text-base">Gasto fijo</Text>
           <Checkbox
+            color="#2563eb"
             status={gastoFijo === true ? "checked" : "unchecked"}
             onPress={() => setGastoFijo(!gastoFijo)}
           />
         </View>
+
+        <View className="flex flex-row w-screen gap-2 items-center">
+          <Text className="text-base">Fecha del gasto</Text>
+          <View className="flex flex-row gap-2 w-1/2">
+            <TouchableOpacity onPress={handleOnPress} className="w-full">
+              <View className="flex flex-row border-b border-gray-500 p-2 w-full justify-between">
+                <Text>{date}</Text>
+                <AntDesign name="calendar" size={20} color="black" />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <Modal animationType="slide" transparent={true} visible={openCalendar}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <DatePicker
+                mode="calendar"
+                minimunDate={today}
+                selected={date}
+                onDateChange={handleChange}
+              />
+
+              <View className="flex flex-row gap-4">
+                <TouchableOpacity
+                  onPress={handleOnPress}
+                  className=" bg-gray-400 w-1/3 py-2 items-center rounded-md mt-3"
+                >
+                  <Text>Cerrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleOnPress}
+                  className=" bg-blue-600 w-1/3 py-2 items-center rounded-md mt-3"
+                >
+                  <Text>OK</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         <TouchableOpacity
           className="flex w-full bg-blue-600 p-2 rounded-md items-center mt-3 bottom-3 absolute"
@@ -334,5 +295,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     gap: 10,
     position: "relative",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    width: "90%",
+    padding: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
