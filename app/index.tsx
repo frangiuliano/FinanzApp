@@ -2,15 +2,7 @@ import NavBar from "@/components/NavBar";
 import QuickAccess from "@/components/QuickAccess";
 import ResumeCardHome from "@/components/ResumeCardHome";
 import { Link } from "expo-router";
-import { useState } from "react";
-import {
-  SafeAreaView,
-  Text,
-  View,
-  StyleSheet,
-  StatusBar,
-  Pressable,
-} from "react-native";
+import { SafeAreaView, StyleSheet, StatusBar } from "react-native";
 
 export default function Index() {
   return (

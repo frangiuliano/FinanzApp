@@ -29,7 +29,7 @@ import { useNavigation } from "expo-router";
 import { NavigationProp } from "@react-navigation/native";
 import { Link } from "expo-router";
 
-export default function NativeForm() {
+export default function SpendForm() {
   const today = new Date();
 
   const startDate = getFormatedDate(

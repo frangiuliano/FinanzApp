@@ -19,17 +19,5 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
-const sarasa = db.collection("users").add({
-  first: "Ada",
-  last: "Lovelace",
-  born: 1815
-})
-.then((docRef) => {
-  console.log("Document written with ID: ", docRef.id);
-})
-.catch((error) => {
-  console.error("Error adding document: ", error);
-});
-
 export default firebase;
-export { db, sarasa };
+export { db };
