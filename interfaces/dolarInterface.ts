@@ -10,4 +10,5 @@ export interface Dolar {
 export interface UtilsState {
   dolares: Dolar[] | null;
   dolarTarjeta: Dolar[] | null;
+  autenticado: Boolean;
 }

@@ -4,6 +4,7 @@ import { UtilsState } from "../../interfaces/dolarInterface";
 const initialState: UtilsState = {
   dolares: [],
   dolarTarjeta: [],
+  autenticado: false,
 };
 
 export const utilsSlice = createSlice({
@@ -16,9 +17,12 @@ export const utilsSlice = createSlice({
     setDolarTarjeta: (state, action) => {
       state.dolarTarjeta = action.payload;
     },
+    setAutenticado: (state, action) => {
+      state.autenticado = action.payload;
+    },
   },
 });
 
-export const { setDolar, setDolarTarjeta } = utilsSlice.actions;
+export const { setDolar, setDolarTarjeta, setAutenticado } = utilsSlice.actions;
 
 export default utilsSlice.reducer;
