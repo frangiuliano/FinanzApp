@@ -5,7 +5,8 @@ import {
   setMetodoDePago,
   addGasto,
 } from "@/redux/slices/formSlice";
-import firebase from "./database/firebase";
+import { db } from "./database/firebase";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import {
   Categoria,
   CantidadDeCuotas,
@@ -13,15 +14,12 @@ import {
   MetodoDePago,
   Gasto,
 } from "@/interfaces/formInterfaces";
-import { AppDispatch } from "@/redux/store"; // Importa tu tipo AppDispatch si lo tienes definido
+import { AppDispatch } from "@/redux/store";
 import * as Burnt from "burnt";
 
 export const getCategories = async (dispatch: AppDispatch) => {
   try {
-    const querySnapshot = await firebase
-      .firestore()
-      .collection("categorias")
-      .get();
+    const querySnapshot = await getDocs(collection(db, "categorias"));
     const categories: Categoria[] = [];
 
     querySnapshot.forEach((doc) => {
@@ -36,10 +34,7 @@ export const getCategories = async (dispatch: AppDispatch) => {
 
 export const getCuotas = async (dispatch: AppDispatch) => {
   try {
-    const querySnapshot = await firebase
-      .firestore()
-      .collection("cantidadDeCuotas")
-      .get();
+    const querySnapshot = await getDocs(collection(db, "cantidadDeCuotas"));
     const cantidadDeCuotas: CantidadDeCuotas[] = [];
 
     querySnapshot.forEach((doc) => {
@@ -54,10 +49,7 @@ export const getCuotas = async (dispatch: AppDispatch) => {
 
 export const getMoneda = async (dispatch: AppDispatch) => {
   try {
-    const querySnapshot = await firebase
-      .firestore()
-      .collection("monedas")
-      .get();
+    const querySnapshot = await getDocs(collection(db, "monedas"));
     const monedas: Moneda[] = [];
 
     querySnapshot.forEach((doc) => {
@@ -72,10 +64,7 @@ export const getMoneda = async (dispatch: AppDispatch) => {
 
 export const getMetodosDePago = async (dispatch: AppDispatch) => {
   try {
-    const querySnapshot = await firebase
-      .firestore()
-      .collection("metodosDePago")
-      .get();
+    const querySnapshot = await getDocs(collection(db, "metodosDePago"));
     const metodosDePago: MetodoDePago[] = [];
 
     querySnapshot.forEach((doc) => {
@@ -90,10 +79,7 @@ export const getMetodosDePago = async (dispatch: AppDispatch) => {
 
 export const addSpend = (spend: Gasto) => async (dispatch: AppDispatch) => {
   try {
-    const docRef = await firebase
-      .firestore()
-      .collection("gastos")
-      .add(spend);
+    const docRef = await addDoc(collection(db, "gastos"), spend);
     console.log("Document written with ID: ", docRef.id);
 
     dispatch(addGasto(spend));
