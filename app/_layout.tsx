@@ -9,6 +9,7 @@ import PreLoginScreen from "./login/preLoginScreen";
 import CreateAccountScreen from "./login/createAccountScreen";
 import AuthLoadingScreen from "./authLoadingScreen";
 import TabNavigator from "../navigation/TabsNavigationRoot";
+import DataAccountScreen from "./dataAccountScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ export default function RootLayout() {
         <Stack.Screen name="home" component={TabNavigator} />
         <Stack.Screen name="spendForm" component={SpendForm} />
         <Stack.Screen name="dolarScreen" component={DolarScreen} />
+        <Stack.Screen name="dataAccountScreen" component={DataAccountScreen} />
       </Stack.Navigator>
     </Provider>
   );
