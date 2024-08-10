@@ -8,10 +8,7 @@ import {
   View,
 } from "react-native";
 import { TextInput } from "react-native-paper";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/services/database/firebase";
 import { useNavigation } from "expo-router";
 import { NavigationProp } from "@react-navigation/native";
@@ -30,7 +27,6 @@ function LoginScreen() {
         navigation.navigate("home");
         console.log("userCredential", userCredential);
         console.log("user", user);
-        // ...
       })
       .catch((error) => {
         console.log("error", error);
